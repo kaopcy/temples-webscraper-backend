@@ -1,0 +1,5 @@
+fastapi>=0.68.0,<0.69.0
+pydantic[dotenv]>=1.8.0,<2.0.0
+uvicorn>=0.15.0,<0.16.0
+motor==2.5.1
+beanie==1.10.8

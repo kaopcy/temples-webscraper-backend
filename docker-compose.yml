@@ -1,0 +1,25 @@
+version: '3.7'
+
+services:
+  temples-webscraper-backend:
+    build: .
+    command: "uvicorn app.main:app --host 0.0.0.0 --port 8080"
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/code
+    depends_on:
+      - mongodb
+  
+  mongodb:
+    image: docker.io/bitnami/mongodb:6.0
+    ports:
+      - "27020:27017"
+    volumes:
+      - 'mongodb_data:/bitnami/mongodb'
+
+volumes:
+  mongodb_data:
+    driver: local
