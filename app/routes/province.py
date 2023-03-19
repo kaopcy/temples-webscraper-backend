@@ -28,12 +28,9 @@ logger = logging.getLogger(__name__)
 templeScraper = TempleScraperService()
 
 
-
 @router.post('/', response_description="get temple")
 async def add_provinces_route(provinceReq: CreateProvinceDTO) -> Province:
     new_province = await add_province(provinceReq)
-    # temples = await get_all_temples()
-    # csv = await templeScraper.to_csv_file("https://th.wikipedia.org/wiki/รายชื่อวัดในจังหวัดเชียงราย")
     return new_province
 
 

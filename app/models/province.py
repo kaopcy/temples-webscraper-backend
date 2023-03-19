@@ -1,5 +1,3 @@
-from fastapi import Body
-
 from typing import List
 
 from pydantic import BaseModel, Field
