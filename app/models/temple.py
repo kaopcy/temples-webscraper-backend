@@ -1,13 +1,19 @@
-from beanie import Document
+from beanie import Document, Indexed
+from typing import List, Optional
 
-# pydantic used for make datamodel come with data validation
-from pydantic import BaseModel , Field
+from pydantic import BaseModel, Field
+
+
+class Images(BaseModel):
+    url: str = Field(...)
+    src: str = Field(...)
+
 
 class Temple(Document):
     name: str = Field(...)
-    description: str = Field(...)
-    imageLinks: List()
-
+    link: str = Field(...)
+    detail: str = Field(...)
+    images: Optional[List["Images"]]
 
     class Collection:
         name = 'temple'
@@ -16,18 +22,22 @@ class Temple(Document):
         schema_extra = {
             "example": {
                 "name": "วัดพลู",
-                "description": "วัดนี้สวยมากแม่ก"
+                "detail": "วัดนี้สวยมากแม่ก",
+                "images": [
+                    {
+                        "url": "www.image.com",
+                        "src": "www.src.image.com"
+                    },
+                    {
+                        "url": "www.image.com",
+                        "src": "www.src.image.com"
+                    }
+                ]
             }
         }
 
-# this class used to defined how each route return templeData
-class TempleData(BaseModel):
-    name: str
-    description: str
-    class Config:
-        schema_extra = {
-            "example": {
-                "name": "วัดพลู",
-                "description": "วัดนี้สวยมากแม่ก"
-            }
-        }
+class CreateTempleDto(BaseModel):
+    name: str = Field(...)
+    link: str = Field(...)
+    detail: str = Field(...)
+    images: Optional[List["Images"]]
