@@ -6,7 +6,7 @@ networks:
     external: true
 
 services:
-  server-1:
+  server:
     build: .
     command: "uvicorn app.main:app --host 0.0.0.0 --port 4001 --reload"
     env_file:

@@ -15,6 +15,7 @@ from app.services.cron import scraping_temples
 
 from app.routes.temple import router as TempleRouter
 from app.routes.province import router as ProvinceRoute
+from app.routes.test import router as TestRoute
 
 app = FastAPI()
 
@@ -42,6 +43,7 @@ async def start_database():
     app.add_exception_handler(RequestValidationError, http_exception_handler)
     app.include_router(TempleRouter, tags=["Temple"], prefix="/temple")
     app.include_router(ProvinceRoute, tags=["Province"], prefix="/province")
+    app.include_router(TestRoute, tags=["Province"], prefix="/test")
     app.add_event_handler('startup', scraping_temples)
 
 

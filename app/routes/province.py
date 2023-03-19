@@ -44,7 +44,7 @@ async def add_provinces_route() -> List[Province]:
 @router.get('/test', response_description="test")
 async def test() -> dict:
 
-    image_response = []
+    response = []
 
     provinces_json = await templeScraper.all()
 
@@ -57,11 +57,12 @@ async def test() -> dict:
                 image_json = image_response.json()
                 temple = await Temple.find_one(Temple.name == temple_object.name)
                 temple.images = image_json['images']
+                response.append(image_json)
                 print(image_json['images'])
                 await temple.save()
             except Exception as err:
                 print(err)
-    return provinces_json
+    return response
 
 
 @router.get('/{province_name}', response_description="get ")
