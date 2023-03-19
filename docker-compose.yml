@@ -1,9 +1,14 @@
 version: '3.7'
 
+networks:
+  default:
+    name: temple-webscraper
+    external: true
+
 services:
-  temples-webscraper-backend:
+  server:
     build: .
-    command: "uvicorn app.main:app --host 0.0.0.0 --port 8080"
+    command: "uvicorn app.main:app --host 0.0.0.0 --port 8080 --reload"
     env_file:
       - .env
     ports:

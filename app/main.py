@@ -1,7 +1,8 @@
-from starlette.exceptions import HTTPException as StarletteHTTPException
-from fastapi.responses import JSONResponse
-from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
+from fastapi.middleware.cors import CORSMiddleware
+import logging
+import logging.config
+from os import path
 
 from typing import Union
 from fastapi import FastAPI, status
@@ -10,30 +11,38 @@ from app.configs.config import initialDatabase
 
 # middlewares
 from app.middlewares.requestValidationException import http_exception_handler
+from app.services.cron import scraping_temples
 
 from app.routes.temple import router as TempleRouter
+from app.routes.province import router as ProvinceRoute
 
 app = FastAPI()
 
-app.add_exception_handler(RequestValidationError, http_exception_handler)
+log_file_path = path.join(path.dirname(path.abspath(__file__)), 'logging.conf')
+logging.basicConfig(filename='log.txt',
+                    filemode='a',
+                    format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
+                    datefmt='%H:%M:%S',
+                    level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
-app.include_router(TempleRouter, tags=["Temple"], prefix="/temple")
 
 @app.on_event('startup')
 async def start_database():
+    logger.info('started')
     await initialDatabase()
-
-@app.exception_handler(RequestValidationError)
-async def http_exception_handler(request, exc: RequestValidationError):
-    errMsg = []
-    for error in exc.errors():
-        # loc means locations
-        loc, msg, bodyKeys = error["loc"], error["msg"], list(exc.body.keys())
-        print(loc[0] in ("body", "query", "path"))
-        filteredLoc = loc[1:] if loc[0] in ("body", "query", "path") else loc
-        field = [a for a in filteredLoc if a not in bodyKeys]
-        errMsg.append({msg: field})
-    return JSONResponse(jsonable_encoder({"detail": exc.errors(), 'errors': errMsg, "body": exc.body}), status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
+    print('started')
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=['*'],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+    app.add_exception_handler(RequestValidationError, http_exception_handler)
+    app.include_router(TempleRouter, tags=["Temple"], prefix="/temple")
+    app.include_router(ProvinceRoute, tags=["Province"], prefix="/province")
+    app.add_event_handler('startup', scraping_temples)
 
 
 @app.get("/", tags=['Root'])

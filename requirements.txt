@@ -3,3 +3,6 @@ pydantic[dotenv]>=1.8.0,<2.0.0
 uvicorn>=0.15.0,<0.16.0
 motor==2.5.1
 beanie==1.10.8
+fastapi-utils==0.2.1
+httpx==0.23.3
+requests==2.28.2
