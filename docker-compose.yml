@@ -8,11 +8,11 @@ networks:
 services:
   server-1:
     build: .
-    command: "uvicorn app.main:app --host 0.0.0.0 --port 8080 --reload"
+    command: "uvicorn app.main:app --host 0.0.0.0 --port 4001 --reload"
     env_file:
       - .env
     ports:
-      - "8080:8080"
+      - "4001:4001"
     volumes:
       - .:/code
     depends_on:
