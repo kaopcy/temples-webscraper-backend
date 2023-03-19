@@ -44,7 +44,7 @@ async def add_provinces_route() -> List[Province]:
 @router.get('/test', response_description="test")
 async def test() -> dict:
 
-    image_json = []
+    image_response = []
 
     provinces_json = await templeScraper.all()
 
@@ -54,11 +54,14 @@ async def test() -> dict:
         for temple_object in province.temples:
             try:
                 image_response = await fetch(f'{Settings().GOOGLE_IMAGE_SCRAPER_URL}/image?keyword={temple_object.name}')
-                image_json.append(image_response.json())
+                image_json = image_response.json()
+                temple = await Temple.find_one(Temple.name == temple_object.name)
+                temple.images = image_json['images']
+                print(image_json['images'])
+                await temple.save()
             except Exception as err:
                 print(err)
-
-    return image_json
+    return provinces_json
 
 
 @router.get('/{province_name}', response_description="get ")
