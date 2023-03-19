@@ -139,11 +139,11 @@ class TempleScraperService:
 
     async def all(self):
         provinces = {
-            # "chumporn": "https://th.wikipedia.org/wiki/รายชื่อวัดในจังหวัดชุมพร",
-            # "chaengrai": "https://th.wikipedia.org/wiki/รายชื่อวัดในจังหวัดเชียงราย",
-            # "trang": "https://th.wikipedia.org/wiki/รายชื่อวัดในจังหวัดตรัง",
+            "chumporn": "https://th.wikipedia.org/wiki/รายชื่อวัดในจังหวัดชุมพร",
+            "chaengrai": "https://th.wikipedia.org/wiki/รายชื่อวัดในจังหวัดเชียงราย",
+            "trang": "https://th.wikipedia.org/wiki/รายชื่อวัดในจังหวัดตรัง",
             "trat": "https://th.wikipedia.org/wiki/รายชื่อวัดในจังหวัดตราด",
-            # "uttaradit": "https://th.wikipedia.org/wiki/รายชื่อวัดในจังหวัดอุตรดิตถ์",
+            "uttaradit": "https://th.wikipedia.org/wiki/รายชื่อวัดในจังหวัดอุตรดิตถ์",
         }
 
         async def worker(province, province_url):
