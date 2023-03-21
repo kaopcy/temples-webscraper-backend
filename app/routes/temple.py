@@ -22,7 +22,7 @@ async def add_temple_route(temple: Temple = Body(...)):
 
 @router.get('/{temple_name}' , response_description="get temple by name")
 async def get_temple_by_name_route(temple_name: str) -> Temple :
-    temple = await get_temple_by_name(temple_name)
+    return await get_temple_by_name(temple_name.lower())
 
 
 @router.put('/', response_description="temple added")

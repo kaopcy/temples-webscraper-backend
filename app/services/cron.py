@@ -21,11 +21,12 @@ async def scraping_temples():
 
     for province in provinces_json:
         province = await add_province(CreateProvinceDTO(**province))
-        await asyncio.sleep(100)
+        await asyncio.sleep(400)
         for temple_object in province.temples:
             try:
                 image_response = await fetch(f'{Settings().GOOGLE_IMAGE_SCRAPER_URL}/image?keyword={temple_object.name}')
                 image_json = image_response.json()
-                await replace_temple_images_by_name(temple_object.name, image_json['images'])
+                if image_json['images'] and len(image_json['images']) >= 3:
+                    await replace_temple_images_by_name(temple_object.name, image_json['images'])
             except Exception as err:
                 print(err)

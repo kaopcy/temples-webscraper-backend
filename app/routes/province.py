@@ -55,7 +55,7 @@ async def test():
             try:
                 image_response = await fetch(f'{Settings().GOOGLE_IMAGE_SCRAPER_URL}/image?keyword={temple_object.name}')
                 image_json = image_response.json()
-                await replace_temple_images_by_name(temple_object.name , image_json)
+                await replace_temple_images_by_name(temple_object.name, image_json)
             except Exception as err:
                 print(err)
 
@@ -63,4 +63,8 @@ async def test():
 @router.get('/{province_name}', response_description="get ")
 async def get_province_by_name_route(province_name: str) -> Province:
     province = await get_province_by_name(province_name)
+
+    def sortfn(a: Temple):
+        return len(a.detail) < 20
+    province.temples.sort(key=sortfn)
     return province

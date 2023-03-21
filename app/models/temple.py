@@ -36,6 +36,7 @@ class Temple(Document):
             }
         }
 
+
 class CreateTempleDto(BaseModel):
     name: str = Field(...)
     link: str = Field(...)
