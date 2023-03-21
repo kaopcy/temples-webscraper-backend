@@ -10,6 +10,9 @@ from app.services.province import (
     get_all_provinces,
     get_province_by_name
 )
+from app.services.temple import (
+    replace_temple_images_by_name
+)
 
 from app.configs.config import Settings
 
@@ -42,10 +45,7 @@ async def add_provinces_route() -> List[Province]:
 
 
 @router.get('/test', response_description="test")
-async def test() -> dict:
-
-    response = []
-
+async def test():
     provinces_json = await templeScraper.all()
 
     for province in provinces_json:
@@ -55,14 +55,9 @@ async def test() -> dict:
             try:
                 image_response = await fetch(f'{Settings().GOOGLE_IMAGE_SCRAPER_URL}/image?keyword={temple_object.name}')
                 image_json = image_response.json()
-                temple = await Temple.find_one(Temple.name == temple_object.name)
-                temple.images = image_json['images']
-                response.append(image_json)
-                print(image_json['images'])
-                await temple.save()
+                await replace_temple_images_by_name(temple_object.name , image_json)
             except Exception as err:
                 print(err)
-    return response
 
 
 @router.get('/{province_name}', response_description="get ")

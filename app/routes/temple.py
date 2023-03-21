@@ -4,7 +4,8 @@ from fastapi.encoders import jsonable_encoder
 from app.services.temple import (
     add_temple,
     get_all_temples,
-    update_temple
+    update_temple,
+    get_temple_by_name
 )
 
 from app.models.temple import (
@@ -18,6 +19,10 @@ router = APIRouter()
 async def add_temple_route(temple: Temple = Body(...)):
     new_temple = await add_temple(temple)
     return new_temple
+
+@router.get('/{temple_name}' , response_description="get temple by name")
+async def get_temple_by_name_route(temple_name: str) -> Temple :
+    temple = await get_temple_by_name(temple_name)
 
 
 @router.put('/', response_description="temple added")
