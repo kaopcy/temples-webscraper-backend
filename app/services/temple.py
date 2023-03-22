@@ -1,6 +1,8 @@
 from typing import List
 
-from app.models.temple import Temple, Images
+from beanie.operators import Text
+
+from app.models.temple import Temple, Images, TempleName
 from app.models.province import Province
 
 
@@ -33,6 +35,10 @@ async def get_all_temples():
 
 async def get_temple_by_name(temple_name: str) -> Temple:
     return await Temple.find_one(Temple.name == temple_name)
+
+
+async def get_temple_by_query(query: str) -> List[str]:
+    return [temple for temple in await Temple.find_all(projection_model=TempleName).to_list() if query in temple.name]
 
 
 async def replace_temple_images_by_name(temple_name: str, images: List[Images]) -> Temple:

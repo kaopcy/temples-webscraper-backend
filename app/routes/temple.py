@@ -5,7 +5,8 @@ from app.services.temple import (
     add_temple,
     get_all_temples,
     update_temple,
-    get_temple_by_name
+    get_temple_by_name,
+    get_temple_by_query
 )
 
 from app.models.temple import (
@@ -34,4 +35,9 @@ async def add_temple_route(temple: Temple = Body(...)):
 @router.get('/', response_description="get temple")
 async def get_all_temples_route() -> Temple:
     temples = await get_all_temples()
+    return temples
+
+@router.get('/search/{query}', response_description="search temple")
+async def get_temple_by_query_route(query: str) -> Temple:
+    temples = await get_temple_by_query(query)
     return temples
