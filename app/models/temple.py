@@ -1,5 +1,6 @@
-from beanie import Document, Indexed
+from beanie import Document, Indexed, PydanticObjectId
 from typing import List, Optional
+
 
 from pydantic import BaseModel, Field
 
@@ -35,6 +36,11 @@ class Temple(Document):
                 ]
             }
         }
+
+
+class TempleName(BaseModel):
+    id: PydanticObjectId = Field(..., alias="_id")
+    name: str = Field(...)
 
 
 class CreateTempleDto(BaseModel):
