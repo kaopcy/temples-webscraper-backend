@@ -1,9 +1,14 @@
 from typing import List
 
+import motor.motor_asyncio
 from beanie.operators import Text
+from bson.json_util import dumps
 
-from app.models.temple import Temple, Images, TempleName
+from app.configs.config import Settings
 from app.models.province import Province
+from app.models.temple import Images, Temple, TempleName, TempleResponse
+
+from app.libs.parser import json_parser
 
 
 def temple_formatter(temple) -> dict:
@@ -46,3 +51,115 @@ async def replace_temple_images_by_name(temple_name: str, images: List[Images]) 
     temple.images = images
     await temple.save()
     return temple
+
+PAGE_AMOUNT = 10
+
+
+async def get_temple_by_filter_sort_search(page: int, search: str, filter: str):
+    # use motor instead because beanie can't perform normal aggregation
+    client = motor.motor_asyncio.AsyncIOMotorClient(Settings().DATABASE_URL)
+
+    database = client.toc
+    collection = database.get_collection("province")
+
+    pipeline = [
+        {
+            "$match": {
+                "name": {
+                    "$in": filter
+                }
+            }
+        },
+        {
+            '$lookup': {
+                'from': 'temple',
+                'localField': 'temples.$id',
+                'foreignField': '_id',
+                'as': 'temple_info'
+            }
+        }, {
+            '$unwind': {
+                'path': '$temple_info'
+            }
+        }, {
+            '$project': {
+                "_id": "$temple_info._id",
+                'name': '$temple_info.name',
+                'provinceName': '$name',
+                'link': '$temple_info.link',
+                'detail': '$temple_info.detail',
+                'images': '$temple_info.images',
+                "wordCount": {"$strLenCP": "$temple_info.detail"},
+                'imagesCount': {
+                    '$cond': [
+                        {
+                            '$ifNull': [
+                                '$temple_info.images', False
+                            ]
+                        }, {
+                            '$size': '$temple_info.images'
+                        }, 0
+                    ]
+                }
+            }
+        }, {
+            '$match': {
+                'name': {
+                    '$regex': search,
+                    '$options': 'i'
+                }
+            }
+        }, {
+            '$sort': {
+                'wordCount': -1,
+                'provinceName': 1,
+                'imagesCount': -1,
+            }
+        }, {
+            "$group": {
+                "_id": None,
+                "data": {
+                    "$push": "$$ROOT",
+                },
+                "count": {
+                    "$sum": 1,
+                },
+            }
+        }, {
+            "$project": {
+                "_id": 0,
+                "data": {
+                    "$slice": ["$data", PAGE_AMOUNT * (page-1), 10]
+                },
+                "options": {
+                    "totalTemples": "$count",
+                    "totalPages": {
+                        "$toInt": {
+                            "$ceil": {
+                                "$divide": ["$count", 10],
+                            },
+                        }
+                    },
+                    "nextPage": {
+                        "$cond": [
+                            {
+                                "$lt": [page, {
+                                    "$toInt": {
+                                        "$ceil": {
+                                            "$divide": ["$count", 10],
+                                        },
+                                    }
+                                }],
+                            },
+                            page+1,
+                            None,
+                        ],
+                    },
+                },
+            }
+        }
+    ]
+    result = [a async for a in collection.aggregate(pipeline)]
+    print(result)
+
+    return json_parser([] if len(result) <= 0 else result[0])

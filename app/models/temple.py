@@ -48,3 +48,12 @@ class CreateTempleDto(BaseModel):
     link: str = Field(...)
     detail: str = Field(...)
     images: Optional[List["Images"]]
+
+
+class TempleResponse(BaseModel):
+    id: str = Field(None , alias="_id")
+    temple_name: str = Field(...)
+    province_name: str = Field(...)
+    detail: str = Field(...)
+    images: Optional[List[Images]]
+    images_count: int
