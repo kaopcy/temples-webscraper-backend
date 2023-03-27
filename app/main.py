@@ -40,7 +40,7 @@ async def start_database():
         allow_methods=["*"],
         allow_headers=["*"],
     )
-    app.add_exception_handler(RequestValidationError, http_exception_handler)
+    # app.add_exception_handler(RequestValidationError, http_exception_handler)
     app.include_router(TempleRouter, tags=["Temple"], prefix="/temple")
     app.include_router(ProvinceRoute, tags=["Province"], prefix="/province")
     app.include_router(TestRoute, tags=["Province"], prefix="/test")
