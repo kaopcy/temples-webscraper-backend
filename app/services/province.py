@@ -26,9 +26,11 @@ async def add_province(provinceReq: CreateProvinceDTO) -> Province:
 
 async def get_all_provinces() -> List[Province]:
     provinces = await Province.find(fetch_links=True).to_list()
+
     return provinces
 
 
 async def get_province_by_name(name: str) -> Province:
     province = await Province.find_one(Province.name == name, fetch_links=True)
     return province
+
