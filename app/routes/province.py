@@ -31,13 +31,13 @@ logger = logging.getLogger(__name__)
 templeScraper = TempleScraperService()
 
 
-@router.post('/', response_description="get temple")
+@router.post('', response_description="get temple")
 async def add_provinces_route(provinceReq: CreateProvinceDTO) -> Province:
     new_province = await add_province(provinceReq)
     return new_province
 
 
-@router.get('/', response_description="get temple")
+@router.get('', response_description="get temple")
 async def add_provinces_route() -> List[Province]:
     logger.info('get province route')
     provinces = await get_all_provinces()

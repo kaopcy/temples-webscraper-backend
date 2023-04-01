@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Body
 from fastapi.encoders import jsonable_encoder
+from urllib.parse import unquote
 
 from app.models.temple import Temple
 from app.services.temple import (add_temple, get_all_temples,
@@ -17,6 +18,7 @@ router = APIRouter()
 
 @router.get('/{temple_name}' , response_description="get temple by name")
 async def get_temple_by_name_route(temple_name: str) -> Temple :
+    temple_name = unquote(temple_name)
     return await get_temple_by_name(temple_name.lower())
 
 
@@ -40,5 +42,9 @@ async def get_temple_by_query_route(query: str) -> Temple:
 
 @router.get('/aa/', response_description="search temple")
 async def get_temple_by_filter_sort_search_route(page: int, search: str, filter: str):
-    print(filter)
+
+    search = unquote(search)
+    filter = unquote(filter)
+
+    print(search)
     return await get_temple_by_filter_sort_search(page, search, list(filter.split(",")) or [])
