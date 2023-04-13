@@ -17,3 +17,11 @@ class Province(Document):
 class CreateProvinceDTO(BaseModel):
     name: str = Field(...)
     temples: List[CreateTempleDto]
+
+class ProvinceNameDTO(BaseModel):
+    name: str
+    temples: List[str]
+
+    class Settings:
+        projection = {"name": 1, "temples": "$temples.name"}
+

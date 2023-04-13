@@ -87,8 +87,10 @@ async def get_temple_by_filter_sort_search(page: int, search: str, filter: str):
                 'name': '$temple_info.name',
                 'provinceName': '$name',
                 'link': '$temple_info.link',
-                'detail': '$temple_info.detail',
-                'images': '$temple_info.images',
+                'detail': "$temple_info.detail",
+                'images': "$temple_info.images",
+                # 'detail': {"$substrCP": ['$temple_info.detail', 0, 200]},
+                'images': {"$slice": ['$temple_info.images', 4]},
                 "wordCount": {"$strLenCP": "$temple_info.detail"},
                 'imagesCount': {
                     '$cond': [

@@ -1,29 +1,23 @@
+import asyncio
+import base64
 import logging
-from typing import List
 from collections import namedtuple
-
+from typing import List
+from urllib.parse import unquote
 
 from fastapi import APIRouter
-
-from app.services.province import (
-    add_province,
-    get_all_provinces,
-    get_province_by_name
-)
-from app.services.temple import (
-    replace_temple_images_by_name
-)
+from fastapi.responses import Response, StreamingResponse
 
 from app.configs.config import Settings
-
-from app.models.temple import (Temple)
-from app.models.province import (Province, CreateProvinceDTO)
-
-from app.libs.templeScraper import TempleScraperService
 from app.libs.asynchronous import async_caller
 from app.libs.fetch import fetch
-
-import asyncio
+from app.libs.templeScraper import TempleScraperService
+from app.models.province import CreateProvinceDTO, Province
+from app.models.temple import Temple
+from app.services.province import (add_province, get_all_provinces,
+                                   get_csv_from_provinces,
+                                   get_province_by_name)
+from app.services.temple import replace_temple_images_by_name
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -58,6 +52,18 @@ async def test():
                 await replace_temple_images_by_name(temple_object.name, image_json)
             except Exception as err:
                 print(err)
+
+
+@router.get('/csv', response_description="get csv file")
+async def get_csv_from_provinces_route(provincesQuery: str):
+
+    provincesQuery = unquote(provincesQuery)
+    csv_data = await get_csv_from_provinces(list(provincesQuery.split(",")))
+
+    response = Response(csv_data.encode('utf-8'), media_type="text/csv")
+    # response.headers["Content-Disposition"] = "attachment; filename=export.csv"
+    # return response
+    return response
 
 
 @router.get('/{province_name}', response_description="get ")

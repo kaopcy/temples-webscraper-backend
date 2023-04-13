@@ -1,9 +1,14 @@
 from beanie import WriteRules
-from beanie.operators import Set
+from beanie.operators import (Set, In)
 from typing import List
 
-from app.models.province import Province, CreateProvinceDTO
+import csv
+import os
+
+from app.models.province import Province, CreateProvinceDTO, ProvinceNameDTO
 from app.models.temple import Temple
+
+from app.libs.translator import province_to_thai
 
 
 async def add_province(provinceReq: CreateProvinceDTO) -> Province:
@@ -34,3 +39,15 @@ async def get_province_by_name(name: str) -> Province:
     province = await Province.find_one(Province.name == name, fetch_links=True)
     return province
 
+
+async def get_csv_from_provinces(provinces: List[str]) -> Province:
+    provinces.sort()
+
+    provinces = await Province.find(In(Province.name, provinces), projection_model=ProvinceNameDTO, fetch_links=True).to_list()
+    csv_list = [['จังหวัด', 'วัด']]
+    for province in provinces:
+        province_name = province_to_thai(province.name)
+        for temple in province.temples:
+            csv_list.append([province_name, temple])
+
+    return '\uFEFF' + "\n".join([",".join(row) for row in csv_list])
