@@ -82,7 +82,7 @@ async def remove_unused_image():
 
     # for province in all_provinces:
     unusable_url= []
-    for temple in all_provinces[2].temples:
+    for temple in all_provinces[0].temples:
         unusable_url.append({
             "name": temple.name,
             "urls": await get_unusable_image_by_temple(temple.name)
