@@ -1,30 +1,32 @@
-version: '3.7'
+version: "3.7"
 
 networks:
-  default:
-    name: temple-webscraper
-    external: true
+    default:
+        name: temple-webscraper
+        external: true
 
 services:
-  server:
-    build: .
-    command: "uvicorn app.main:app --host 0.0.0.0 --port 4001 --reload"
-    env_file:
-      - .env
-    ports:
-      - "4001:4001"
-    volumes:
-      - .:/code
-    depends_on:
-      - mongodb
-  
-  mongodb:
-    image: docker.io/bitnami/mongodb:6.0
-    ports:
-      - "27020:27017"
-    volumes:
-      - 'mongodb_data:/bitnami/mongodb'
+    server:
+        build: .
+        command: "uvicorn app.main:app --host 0.0.0.0 --port 4001 --reload"
+        env_file:
+            - .env
+        ports:
+            - "4001:4001"
+        volumes:
+            - .:/code
+        depends_on:
+            - mongodb
+        restart: always
+
+    mongodb:
+        image: docker.io/bitnami/mongodb:6.0
+        ports:
+            - "27020:27017"
+        volumes:
+            - "mongodb_data:/bitnami/mongodb"
+        restart: always
 
 volumes:
-  mongodb_data:
-    driver: local
+    mongodb_data:
+        driver: local

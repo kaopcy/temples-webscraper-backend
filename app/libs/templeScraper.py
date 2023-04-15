@@ -137,7 +137,7 @@ class TempleScraperService:
             temples_html, temples_html_with_detail)
         return cleaned_temple_data
 
-    async def all(self):
+    async def get_all(self):
         provinces = {
             "mahasarakam": "https://th.wikipedia.org/wiki/รายชื่อวัดในจังหวัดมหาสารคาม",
             "mukdaharn": "https://th.wikipedia.org/wiki/รายชื่อวัดในจังหวัดมุกดาหาร",
