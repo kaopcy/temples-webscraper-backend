@@ -39,7 +39,47 @@ async def get_all_temples():
 
 
 async def get_temple_by_name(temple_name: str) -> Temple:
-    return await Temple.find_one(Temple.name == temple_name)
+
+    client = motor.motor_asyncio.AsyncIOMotorClient(Settings().DATABASE_URL)
+
+    database = client.toc
+    collection = database.get_collection("province")
+
+    pipeline = [
+        {
+            '$lookup': {
+                'from': 'temple',
+                'localField': 'temples.$id',
+                'foreignField': '_id',
+                'as': 'temple_info'
+            }
+        }, {
+            '$unwind': {
+                'path': '$temple_info'
+            }
+        }, {
+            '$project': {
+                'name': '$temple_info.name',
+                'detail': '$temple_info.detail',
+                '_id': '$temple_info._id',
+                'images': '$temple_info.images',
+                'link': '$temple_info.link',
+                'provinceName': '$name'
+            }
+        }, {
+            '$match': {
+                'name': {
+                    '$regex': temple_name,
+                    '$options': 'i'
+                }
+            }
+        }
+    ]
+
+    result = [a async for a in collection.aggregate(pipeline)]
+    print(result)
+
+    return json_parser([] if len(result) <= 0 else result[0])
 
 
 async def get_temple_by_query(query: str) -> List[str]:

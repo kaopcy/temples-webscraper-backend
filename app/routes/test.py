@@ -76,13 +76,13 @@ async def get_unusable_image_by_temple(temple_name: str):
     await temple.save()
     return unusable_url
 
-@router.get('/remove_unused_image')
-async def remove_unused_image():
-    all_provinces = await Province.find(fetch_links=True).to_list()
+@router.get('/remove_unused_image/{province_name}')
+async def remove_unused_image(province_name: str):
+    all_provinces = await Province.find_one(Province.name == province_name , fetch_links=True)
 
     # for province in all_provinces:
     unusable_url= []
-    for temple in all_provinces[0].temples:
+    for temple in all_provinces.temples:
         unusable_url.append({
             "name": temple.name,
             "urls": await get_unusable_image_by_temple(temple.name)
