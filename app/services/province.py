@@ -44,10 +44,10 @@ async def get_csv_from_provinces(provinces: List[str]) -> Province:
     provinces.sort()
 
     provinces = await Province.find(In(Province.name, provinces), projection_model=ProvinceNameDTO, fetch_links=True).to_list()
-    csv_list = [['จังหวัด', 'วัด']]
+    csv_list = [['ชื่อวัด']]
     for province in provinces:
         province_name = province_to_thai(province.name)
         for temple in province.temples:
-            csv_list.append([province_name, temple])
+            csv_list.append([temple])
 
     return '\uFEFF' + "\n".join([",".join(row) for row in csv_list])

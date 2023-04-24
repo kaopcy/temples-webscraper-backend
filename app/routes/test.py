@@ -1,4 +1,5 @@
 import asyncio
+import re
 
 from fastapi import APIRouter, status
 
@@ -16,6 +17,26 @@ router = APIRouter()
 
 templeScraper = TempleScraperService()
 
+
+@router.get('/test_ja/{temple_link}', response_description="scrape all temple and also scrape image")
+async def testja(temple_link: str):
+    if 'th.wikipedia.org' in temple_link:
+        temple_html = await fetch(temple_link)
+        pattern = re.compile(
+            '<div class="mw-parser-output"[\u0000-\uFFFF]*</div>')
+        if(re.search(pattern, temple_html.text)) and not re.search(r'อาจหมายถึง', temple_html.text):
+            result = re.findall(pattern, temple_html.text)[0]
+
+            pattern = re.compile('<p>[\u0000-\uFFFF]*</p>')
+            result = ''.join(re.findall(pattern, result))
+
+            result = re.sub('<meta [\u0000-\uFFFF]*?>', '', result)
+            result = re.sub('<h2>[\u0000-\uFFFF]*', '', result)
+            result = re.sub('<sup[\u0000-\uFFFF]*?</sup>', '', result)
+            result = re.sub('href="[\u0000-\uFFFF]*?"', '', result)
+
+            return result
+    return '<p>no detail</p>'
 @router.get('/scrape_temple_with_image', response_description="scrape all temple and also scrape image")
 async def scrape_temple_with_image() -> dict:
     provinces_json = await templeScraper.get_all()
